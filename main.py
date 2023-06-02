@@ -5,6 +5,7 @@ import pyperclip
 import string
 import json
 
+
 def generate_password():
   password_entry.delete(0, END)
   symbols = string.ascii_letters + string.digits + string.punctuation
@@ -25,7 +26,7 @@ def save():
   }
 
   if len(website) == 0 or len(email) == 0 or len(password) == 0:
-    validation_msg = messagebox.showinfo(title='Error', message='Empty Fields')
+    messagebox.showinfo(title='Error', message='Empty Fields')
   else:
     is_ok = messagebox.askokcancel(title=website, message=f'These are the details entered:\n Email: {email}\n'
                                                   f'Password: {password}\n Is it ok to save?')
@@ -46,6 +47,16 @@ def save():
         password_entry.delete(0, END)
 
 
+def find_website_info():
+  try:
+    with open('data.json', 'r') as f:
+      data = json.load(f)
+      website = website_entry.get()
+      messagebox.showinfo(title=f'{website}', message=f'Email: {data[website]["email"]}\nPassword: {data[website]["password"]}')
+  except (KeyError, FileNotFoundError, json.decoder.JSONDecodeError):
+    messagebox.showinfo(title='Error', message='Not Found')
+
+
 window = Tk()
 window.title('Password Manager')
 window.config(padx=20, pady=20)
@@ -64,14 +75,16 @@ password_label = Label(text='Password:')
 password_label.grid(column=0, row=3)
 
 #Emtries
-website_entry = Entry(width=35)
-website_entry.grid(column=1, row=1, columnspan=3)
+website_entry = Entry(width=25)
+website_entry.grid(column=1, row=1)
 email_entry = Entry(width=35)
 email_entry.grid(column=1, row=2, columnspan=2)
 password_entry = Entry(width=26)
 password_entry.grid(column=1, row=3)
 
 #Buttons
+search_button = Button(text='Search', command=find_website_info)
+search_button.grid(column=2, row=1)
 generate_password_button = Button(text='Generate', command=generate_password)
 generate_password_button.grid(column=2, row=3)
 add_button = Button(text='Add', width=36, command=save)
